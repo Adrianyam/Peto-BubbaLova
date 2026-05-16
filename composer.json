@@ -1,5 +1,6 @@
 {
     "require": {
-        "laravel/jetstream": "^5.5"
+        "laravel/jetstream": "^5.5",
+        "spatie/laravel-permission": "^6.25"
     }
 }
