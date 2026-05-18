@@ -1,12 +1,12 @@
 <x-admin-layout>
     <x-slot name="tittle">
-        Gestión de Cocineros
+        Gestión de Cajeros
     </x-slot>
 
     <div class="px-4 py-6">
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-gray-800">Personal de Cocina</h1>
-            <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-3 py-1 rounded-full uppercase">
+            <h1 class="text-2xl font-bold text-gray-800">Personal de Cajas</h1>
+            <span class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full uppercase">
                 {{ $users->count() }} Registrados
             </span>
         </div>
@@ -26,7 +26,7 @@
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="flex items-center">
-                                    <div class="h-10 w-10 flex-shrink-0 bg-indigo-500 rounded-full flex items-center justify-center text-white font-bold">
+                                    <div class="h-10 w-10 flex-shrink-0 bg-green-500 rounded-full flex items-center justify-center text-white font-bold">
                                         {{ substr($user->name, 0, 1) }}
                                     </div>
                                     <div class="ml-4">
@@ -39,7 +39,7 @@
                                 {{ $user->email }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                <i class="fa-solid fa-phone text-xs mr-1 text-indigo-400"></i> {{ $user->phone ?? 'Sin teléfono' }}
+                                <i class="fa-solid fa-phone text-xs mr-1 text-green-400"></i> {{ $user->phone ?? 'Sin teléfono' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
@@ -50,8 +50,8 @@
                     @empty
                         <tr>
                             <td colspan="4" class="px-6 py-12 text-center">
-                                <i class="fa-solid fa-utensils text-gray-200 text-5xl mb-3"></i>
-                                <p class="text-gray-400 font-medium">No hay cocineros registrados todavía.</p>
+                                <i class="fa-solid fa-cash-register text-gray-200 text-5xl mb-3"></i>
+                                <p class="text-gray-400 font-medium">No hay cajeros registrados todavía.</p>
                             </td>
                         </tr>
                     @endforelse

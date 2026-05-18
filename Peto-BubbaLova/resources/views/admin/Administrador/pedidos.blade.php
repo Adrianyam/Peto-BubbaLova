@@ -1,8 +1,24 @@
 <x-admin-layout tittle="Pedidos del Día">
     <div class="px-4 py-6">
-        <div class="mb-8">
-            <h1 class="text-2xl font-bold text-gray-800 mb-2">Pedidos del Día</h1>
-            <p class="text-gray-500 capitalize"><i class="fa-solid fa-calendar-day mr-2 text-indigo-500"></i>{{ \Carbon\Carbon::today()->translatedFormat('l, d \d\e F \d\e Y') }}</p>
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800 mb-2">Pedidos del Día</h1>
+                <p class="text-gray-500 capitalize"><i class="fa-solid fa-calendar-day mr-2 text-indigo-500"></i>{{ \Carbon\Carbon::today()->translatedFormat('l, d \d\e F \d\e Y') }}</p>
+            </div>
+            <div class="mt-4 md:mt-0 flex space-x-2">
+                <a href="{{ route('admin.administrador.pedidos.pdf') }}" 
+                   class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 active:bg-red-900 focus:outline-none focus:border-red-900 focus:ring ring-red-300 disabled:opacity-25 transition ease-in-out duration-150">
+                    <i class="fa-solid fa-file-pdf mr-2"></i> Generar PDF
+                </a>
+                
+                <form action="{{ route('admin.administrador.pedidos.email') }}" method="POST">
+                    @csrf
+                    <button type="submit" 
+                            class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:border-indigo-900 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150">
+                        <i class="fa-solid fa-paper-plane mr-2"></i> Enviar por Correo
+                    </button>
+                </form>
+            </div>
         </div>
 
         <!-- Estadísticas de Cajeros -->

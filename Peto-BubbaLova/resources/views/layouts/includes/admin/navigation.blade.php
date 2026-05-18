@@ -8,10 +8,6 @@
   <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M5 7h14M5 12h14M5 17h10"/>
    </svg>
          </button>
-        <a href="/" class="flex ms-2 md:me-24">
-          <img src="{{asset('images/perfil.jpg')}}" class="h-6 me-3" alt="perfil Logo" />
-          <span class="self-center text-lg font-semibold whitespace-nowrap dark:text-white"></span>
-        </a>
       </div>
       <div class="ms-3 relative">
                     <x-dropdown align="right" width="48">

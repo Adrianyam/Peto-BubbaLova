@@ -3,7 +3,10 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    if (\Illuminate\Support\Facades\Auth::check()) {
+        return redirect()->route('admin.dashboard');
+    }
+    return redirect()->route('login');
 });
 
 Route::middleware([
