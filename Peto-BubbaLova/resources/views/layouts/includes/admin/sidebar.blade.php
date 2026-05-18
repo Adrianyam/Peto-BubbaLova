@@ -48,19 +48,19 @@
          'submenu' => [
             [
                'name' => 'Pedidos del dia',
-               'href' => '#',
+               'href' => route('admin.administrador.pedidos'),
             ],
             [
                'name' => 'Inventario',
-               'href' => '#',
+               'href' => route('admin.administrador.inventario'),
             ],
             [
                'name' => 'Registrar usuarios',
-               'href' => '#',
+               'href' => route('admin.administrador.usuarios'),
             ],
             [
                 'name' => 'Productos',
-                'href' => '#',
+                'href' => route('admin.administrador.productos'),
             ]
          ],
       ],

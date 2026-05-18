@@ -59,6 +59,8 @@
 
       @livewireScripts
 
+      @stack('js')
+
       <script>
         // Confirm delete using SweetAlert2 for any form marked with data-swal-confirm
         document.addEventListener('submit', function (event) {
