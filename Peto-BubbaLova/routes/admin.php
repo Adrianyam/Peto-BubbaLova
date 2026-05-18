@@ -70,7 +70,22 @@ Route::get('/appointments', function(){ return "Página de Citas"; })->name('app
 Route::get('/administrador', function(){ return view('admin.administrador'); })->name('administrador.index');
 
 Route::get('/administrador/pedidos', function(){ 
-    return view('admin.administrador.pedidos'); 
+    $today = \Carbon\Carbon::today();
+    
+    // Obtener estadísticas por cajero para hoy
+    $cashierStats = \App\Models\User::role('Cajeros') // Asumiendo que el rol se llama 'Cajeros'
+        ->withCount(['orders' => function($query) use ($today) {
+            $query->whereDate('created_at', $today);
+        }])
+        ->get();
+
+    // Obtener todos los pedidos de hoy con sus detalles
+    $orders = \App\Models\Order::with(['user', 'items.product'])
+        ->whereDate('created_at', $today)
+        ->latest()
+        ->get();
+
+    return view('admin.administrador.pedidos', compact('orders', 'cashierStats')); 
 })->name('administrador.pedidos');
 
 Route::get('/administrador/inventario', function(){ 
@@ -292,5 +307,50 @@ Route::delete('/administrador/productos/{product}', function(\App\Models\Product
 })->name('administrador.productos.destroy');
 
 Route::get('/cocineros', function(){ return view('admin.cocineros'); })->name('cocineros.index');
-Route::get('/cajeros', function(){ return view('admin.cajeros'); })->name('cajeros.index');
+Route::get('/cajeros', function(){ 
+    $products = \App\Models\Product::all();
+    return view('admin.cajeros.index', compact('products')); 
+})->name('cajeros.index');
+
+Route::post('/cajeros/pedidos', function(\Illuminate\Http\Request $request){
+    $request->validate([
+        'customer_name' => 'nullable|string|max:255',
+        'items' => 'required|array|min:1',
+        'items.*.id' => 'required|exists:products,id',
+        'items.*.quantity' => 'required|integer|min:1',
+    ]);
+
+    $total = 0;
+    $orderItems = [];
+
+    foreach ($request->items as $item) {
+        $product = \App\Models\Product::find($item['id']);
+        $price = $product->price;
+        $subtotal = $price * $item['quantity'];
+        $total += $subtotal;
+
+        $orderItems[] = [
+            'product_id' => $product->id,
+            'quantity' => $item['quantity'],
+            'price' => $price
+        ];
+    }
+
+    $order = \App\Models\Order::create([
+        'user_id' => auth()->id(),
+        'customer_name' => $request->customer_name,
+        'total' => $total,
+        'status' => 'pendiente'
+    ]);
+
+    foreach ($orderItems as $details) {
+        $order->items()->create($details);
+    }
+
+    return redirect()->route('admin.cajeros.index')->with('swal', [
+        'icon' => 'success',
+        'title' => '¡Pedido realizado!',
+        'text' => 'Pedido hecho exitosamente.'
+    ]);
+})->name('cajeros.pedidos.store');
  
