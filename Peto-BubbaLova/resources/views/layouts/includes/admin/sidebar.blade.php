@@ -27,16 +27,16 @@
       [
          'name' => 'Cocineros',
          'icon' => 'fa-solid fa-utensils',
-         'href' => route('admin.cocineros.index'),
+         'href' => '#',
          'active' => request()->routeIs('admin.cocineros.*'),
          'submenu' => [
             [
                'name' => 'Ver pedidos',
-               'href' => '#',
+               'href' => route('admin.cocineros.pedidos.index'),
             ],
             [
                'name' => 'Inventario',
-               'href' => '#',
+               'href' => route('admin.cocineros.inventario'),
             ],
          ],
       ],

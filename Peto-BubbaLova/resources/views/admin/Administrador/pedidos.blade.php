@@ -37,7 +37,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cajero</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Productos</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gasto Insumos</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
                     </tr>
                 </thead>
@@ -62,6 +62,20 @@
                                         <li>{{ $item->quantity }}x {{ $item->product->name }}</li>
                                     @endforeach
                                 </ul>
+                            </td>
+                            <td class="px-6 py-4 text-sm">
+                                @if($order->materials->count() > 0)
+                                    <ul class="space-y-1">
+                                        @foreach($order->materials as $mat)
+                                            <li class="flex items-center text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
+                                                <i class="fa-solid fa-flask mr-1 text-[10px]"></i>
+                                                {{ $mat->pivot->quantity }}x {{ $mat->name }}
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                @else
+                                    <span class="text-gray-300 italic text-[10px]">No registrado</span>
+                                @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-black text-gray-900">
                                 ${{ number_format($order->total, 2) }}

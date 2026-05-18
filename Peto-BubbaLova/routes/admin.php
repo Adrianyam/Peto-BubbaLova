@@ -80,7 +80,7 @@ Route::get('/administrador/pedidos', function(){
         ->get();
 
     // Obtener todos los pedidos de hoy con sus detalles
-    $orders = \App\Models\Order::with(['user', 'items.product'])
+    $orders = \App\Models\Order::with(['user', 'items.product', 'materials'])
         ->whereDate('created_at', $today)
         ->latest()
         ->get();
@@ -353,4 +353,60 @@ Route::post('/cajeros/pedidos', function(\Illuminate\Http\Request $request){
         'text' => 'Pedido hecho exitosamente.'
     ]);
 })->name('cajeros.pedidos.store');
+
+// RUTAS PARA COCINEROS
+Route::get('/cocineros/pedidos', function() {
+    $orders = \App\Models\Order::with(['items.product', 'user'])
+        ->whereIn('status', ['pendiente', 'en_preparacion', 'listo'])
+        ->whereDate('created_at', \Carbon\Carbon::today())
+        ->latest()
+        ->get();
+    
+    $materials = \App\Models\Material::all();
+    
+    return view('admin.cocineros.pedidos', compact('orders', 'materials'));
+})->name('cocineros.pedidos.index');
+
+Route::patch('/cocineros/pedidos/{order}/status', function(\Illuminate\Http\Request $request, \App\Models\Order $order) {
+    if ($request->status == 'listo') {
+        $request->validate([
+            'status' => 'required|in:en_preparacion,listo',
+            'materials' => 'required|array',
+            'materials.*' => 'required|integer|min:0'
+        ]);
+
+        // Descontar del inventario y registrar uso
+        foreach ($request->materials as $materialId => $quantity) {
+            if ($quantity > 0) {
+                $material = \App\Models\Material::find($materialId);
+                if ($material) {
+                    if ($material->quantity < $quantity) {
+                        return back()->with('swal', [
+                            'icon' => 'error',
+                            'title' => 'Stock insuficiente',
+                            'text' => "No hay suficiente {$material->name} en inventario."
+                        ]);
+                    }
+                    $material->decrement('quantity', $quantity);
+                    $order->materials()->attach($materialId, ['quantity' => $quantity]);
+                }
+            }
+        }
+    } else {
+        $request->validate(['status' => 'required|in:en_preparacion,listo']);
+    }
+
+    $order->update(['status' => $request->status]);
+
+    return back()->with('swal', [
+        'icon' => 'success',
+        'title' => '¡Estado actualizado!',
+        'text' => 'El pedido ha cambiado de estado y se ha descontado el inventario.'
+    ]);
+})->name('cocineros.pedidos.update-status');
+
+Route::get('/cocineros/inventario', function() {
+    $materials = \App\Models\Material::all();
+    return view('admin.cocineros.inventario', compact('materials'));
+})->name('cocineros.inventario');
  

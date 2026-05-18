@@ -17,4 +17,11 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function materials()
+    {
+        return $this->belongsToMany(Material::class, 'order_material')
+                    ->withPivot('quantity')
+                    ->withTimestamps();
+    }
 }
