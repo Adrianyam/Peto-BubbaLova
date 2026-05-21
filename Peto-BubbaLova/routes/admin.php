@@ -292,13 +292,24 @@ Route::middleware(['auth'])->group(function () {
                 ]);
             }
 
-            $user->delete();
+            try {
+                $user->delete();
 
-            return redirect()->route('admin.administrador.usuarios')->with('swal', [
-                'icon' => 'success',
-                'title' => '¡Eliminado!',
-                'text' => 'El usuario ha sido eliminado correctamente.'
-            ]);
+                return redirect()->route('admin.administrador.usuarios')->with('swal', [
+                    'icon' => 'success',
+                    'title' => '¡Eliminado!',
+                    'text' => 'El usuario ha sido eliminado correctamente.'
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                if ($e->getCode() == '23000') {
+                    return redirect()->route('admin.administrador.usuarios')->with('swal', [
+                        'icon' => 'error',
+                        'title' => 'No se puede eliminar',
+                        'text' => 'Este usuario no puede eliminarse porque tiene pedidos registrados a su nombre.'
+                    ]);
+                }
+                throw $e;
+            }
         })->name('administrador.usuarios.destroy');
 
         Route::get('/administrador/productos', function(){ 
@@ -364,16 +375,29 @@ Route::middleware(['auth'])->group(function () {
         })->name('administrador.productos.update');
 
         Route::delete('/administrador/productos/{product}', function(\App\Models\Product $product){
-            if ($product->image_path) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image_path);
-            }
-            $product->delete();
+            try {
+                $imagePath = $product->image_path;
+                $product->delete();
 
-            return redirect()->route('admin.administrador.productos')->with('swal', [
-                'icon' => 'success',
-                'title' => '¡Eliminado!',
-                'text' => 'El producto ha sido eliminado.'
-            ]);
+                if ($imagePath) {
+                    \Illuminate\Support\Facades\Storage::disk('public')->delete($imagePath);
+                }
+
+                return redirect()->route('admin.administrador.productos')->with('swal', [
+                    'icon' => 'success',
+                    'title' => '¡Eliminado!',
+                    'text' => 'El producto ha sido eliminado.'
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                if ($e->getCode() == '23000') {
+                    return redirect()->route('admin.administrador.productos')->with('swal', [
+                        'icon' => 'error',
+                        'title' => 'No se puede eliminar',
+                        'text' => 'Este producto no puede eliminarse porque está asociado a pedidos existentes.'
+                    ]);
+                }
+                throw $e;
+            }
         })->name('administrador.productos.destroy');
     });
 
@@ -459,6 +483,8 @@ Route::middleware(['auth'])->group(function () {
                     'materials.*' => 'required|integer|min:0'
                 ]);
 
+                $lowStockMaterials = collect();
+
                 // Descontar del inventario y registrar uso
                 foreach ($request->materials as $materialId => $quantity) {
                     if ($quantity > 0) {
@@ -467,12 +493,30 @@ Route::middleware(['auth'])->group(function () {
                             if ($material->quantity < $quantity) {
                                 return back()->with('swal', [
                                     'icon' => 'error',
-                                    'title' => 'Stock insuficiente',
-                                    'text' => "No hay suficiente {$material->name} en inventario."
+                                    'title' => 'Sin mas existencias',
+                                    'text' => "No hay suficiente {$material->name} disponible."
                                 ]);
                             }
                             $material->decrement('quantity', $quantity);
                             $order->materials()->attach($materialId, ['quantity' => $quantity]);
+
+                            // Verificar stock bajo (<= 20)
+                            if ($material->fresh()->quantity <= 20) {
+                                $lowStockMaterials->push($material->fresh());
+                            }
+                        }
+                    }
+                }
+
+                // Enviar correo de alerta inmediata si algún material bajó de 20
+                if ($lowStockMaterials->isNotEmpty()) {
+                    $admin = \App\Models\User::role('Administrador')->first();
+                    if ($admin) {
+                        try {
+                            \Illuminate\Support\Facades\Mail::to($admin->email)
+                                ->send(new \App\Mail\LowStockAlert($lowStockMaterials));
+                        } catch (\Exception $e) {
+                            \Illuminate\Support\Facades\Log::error("Error enviando alerta de stock bajo: " . $e->getMessage());
                         }
                     }
                 }
@@ -496,4 +540,3 @@ Route::middleware(['auth'])->group(function () {
     });
 
 });
- 

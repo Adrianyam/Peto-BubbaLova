@@ -34,8 +34,8 @@
                                 @csrf
                                 @method('PATCH')
                                 <input type="hidden" name="status" value="en_preparacion">
-                                <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold py-2 rounded shadow-sm transition">
-                                    PREPARAR AHORA
+                                <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white text-sm font-bold py-3 rounded shadow-lg transition uppercase tracking-wider">
+                                    <i class="fa-solid fa-fire-burner mr-2"></i> PREPARAR AHORA
                                 </button>
                             </form>
                         </div>

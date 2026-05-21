@@ -70,11 +70,11 @@
     ];
 @endphp
 
-<aside id="top-bar-sidebar" class="fixed top-0 left-0 z-40 w-64 h-full transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
+<aside id="top-bar-sidebar" class="fixed top-0 left-0 z-50 w-64 h-full transition-transform -translate-x-full sm:translate-x-0" aria-label="Sidebar">
    <div class="h-full px-3 py-4 overflow-y-auto bg-neutral-primary-soft border-e border-default">
       <div class="flex flex-col items-center mb-6 pt-2">
          <img src="{{ asset('assets/logo.png') }}" class="h-20 w-20 mb-3 rounded-full shadow-md object-cover border-2 border-white" alt="BubbaLova Logo" />
-         <span class="text-xl font-black text-gray-800 tracking-tight">BubbaLova</span>
+         <span class="text-xl font-black text-gray-800 tracking-tight">BobbaLova</span>
          <div class="h-1 w-12 bg-indigo-500 rounded-full mt-1"></div>
       </div>
       <ul class="space-y-2 font-medium">
@@ -101,7 +101,7 @@
                   {{--Revisa si existe el submenu--}}  
                   @isset($link['submenu'])
                      <li>
-                        <button type="button" class="flex items-center w-full justify-between px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group" aria-controls="dropdown-{{ \Illuminate\Support\Str::slug($link['name']) }}" data-collapse-toggle="dropdown-{{ \Illuminate\Support\Str::slug($link['name']) }}">
+                        <button type="button" class="flex items-center w-full justify-between px-2 py-1.5 text-body rounded-base hover:bg-white/20 hover:text-fg-brand group" aria-controls="dropdown-{{ \Illuminate\Support\Str::slug($link['name']) }}" data-collapse-toggle="dropdown-{{ \Illuminate\Support\Str::slug($link['name']) }}">
                            <span class="w-6 h-6 inline-flex items-center justify-center text-gray-500">
                            <i class=" {{ $link['icon'] }} " ></i> </span>
                            <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">{{ $link['name'] }}</span>
@@ -112,14 +112,14 @@
                            @foreach ($link['submenu'] as $item)
                               <li>
                                  <a href="{{ $item['href'] }}" 
-                                 class="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group">{{ $item['name'] }}</a>
+                                 class="pl-10 flex items-center px-2 py-1.5 text-body rounded-base hover:bg-white/20 hover:text-fg-brand group {{ request()->url() == $item['href'] ? 'bg-white/40 font-bold' : '' }}">{{ $item['name'] }}</a>
                               </li>
                            @endforeach
                         </ul>
                      </li>
                   @else
                      <a href="{{$link['href']}}" 
-                        class="flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group {{$link['active'] ? 'bg-gray-100' : '' }}">
+                        class="flex items-center px-2 py-1.5 text-body rounded-base hover:bg-white/20 hover:text-fg-brand group {{$link['active'] ? 'bg-white/40 font-bold' : '' }}">
                            <span class="w-6 h-6 inline-flex items-center justify-center text-gray-500">
                            <i class=" {{ $link['icon'] }} " ></i> </span>
                         <span class="ms-3">{{$link['name']}}</span>
